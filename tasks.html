@@ -1,0 +1,232 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="tables">
+        <table id="main_table">
+            <tbody>
+                <tr>
+                    <th class="Time_header">Time</th>
+                    <th class="Note_header">Note</th>
+                    <th class="Category_header">Category</th>
+                    <th class="Dates_header">Dates</th>
+                    <th class="Status_header">Status</th>
+                    <th class="ID">ID</th>
+                </tr>
+            </tbody>
+        </table>
+        <button type="submit" onclick="newNote()">add row</button>
+        <button type="submit" onclick="deleteRow()">delete row</button>
+        <select id="currStatus" onchange="updateMainTable()">
+            <option value="Active">Active</option>
+            <option value="Archived">Archived</option>
+        </select>
+    </div>
+
+    <table class="tables" id="summary_table">
+        <tbody>
+            <tr>
+                <th class="Note_category">Note category</th>
+                <th class="Active_notes">Active</th>
+                <th class="Archived_notes">Archived</th>
+            </tr>
+            <tr>
+                <td class="category"> Task </td>
+                <td id="Active_tasks"> 0 </td>
+                <td id="Archieved_tasks"> 0 </td>
+            </tr>
+            <tr>
+                <td class="category"> Random Thought </td>
+                <td id="Active_thoughts"> 0 </td>
+                <td id="Archived_thoughts"> 0 </td>
+            </tr>
+            <tr>
+                <td class="category"> Idea </td>
+                <td id="Active_ideas"> 0 </td>
+                <td id="Archived_ideas"> 0 </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript" src="note.js"></script>
+    <script type="text/javascript" src="tables.js"></script>
+    <script>
+
+        const categories = { 0: "Task", 1: "Random Thought", 2: "Idea" };
+        const statuses = { 0: "Active", 1: "Archived" };
+        let notes = [], noteId = 0, currRow = 0, rowIndex = 0, currStatus = 0;
+
+        function updateMainTable() {
+            let table = document.getElementById("main_table");
+            if (document.getElementById("currStatus").options.selectedIndex == 1) {
+                if (currStatus == 0) {
+                    if (currRow != -1) {
+                        table.rows[currRow].style.backgroundColor = "transparent";
+                        currRow = -1;
+                    }
+                    clearTable(table);
+                    for (let i = 0; i < notes.length; i++) {
+                        if (notes[i].Status == statuses[1]) {
+                            addRow(notes[i].Time, notes[i].Text, notes[i].Category, notes[i].Status, notes[i].Id);
+                        }
+                    }
+                }
+                currStatus = 1;
+            } else {
+                if (currStatus == 1) {
+                    if (currRow != -1) {
+                        table.rows[currRow].style.backgroundColor = "transparent";
+                        currRow = -1;
+                    }
+                    clearTable(table);
+                    for (let i = 0; i < notes.length; i++) {
+                        if (notes[i].Status == statuses[0]) {
+                            addRow(notes[i].Time, notes[i].Text, notes[i].Category, notes[i].Status, notes[i].Id);
+                        }
+                    }
+                }
+                currStatus = 0;
+            }
+        }
+
+        function selectRow(noteId) {
+            let table = document.getElementById("main_table");
+            let rowIndex = findRowIndex(document.getElementById("main_table"), noteId);
+            if (currRow != rowIndex) {
+                if (currRow > 0) {
+                    table.rows[currRow].style.backgroundColor = "transparent";
+                }
+                table.rows[rowIndex].style.backgroundColor = "grey";
+                currRow = rowIndex;
+            } else {
+                currRow = -1;
+                table.rows[rowIndex].style.backgroundColor = "transparent";
+            }
+        }
+
+        function changedData(note, id) {
+            let re = /[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+            let dates = [...note.matchAll(re)];
+            let index = findNoteIndex(notes, id);
+            notes[index].Text = note;
+            if (dates != null) {
+                document.getElementById("main_table").rows[currRow].cells[3].innerHTML = dates;
+            } else {
+                document.getElementById("main_table").rows[currRow].cells[3].innerHTML = '';
+            }
+        }
+
+        function changedCategory(id) {
+            let noteIndex = findNoteIndex(notes, id);
+            let categoryIndex = document.getElementById("category" + id).options.selectedIndex;
+            notes[noteIndex].Category = categories[categoryIndex];
+            updateSummaryTable(document.getElementById("summary_table"), notes, statuses, categories);
+        }
+
+        function changedStatus(id) {
+            let noteIndex = findNoteIndex(notes, id);
+            let statusIndex = document.getElementById("status" + id).options.selectedIndex;
+            notes[noteIndex].Status = statuses[statusIndex];
+            if (statusIndex == 1) {
+                if (currStatus == 0) {
+                    currRow = findRowIndex(document.getElementById("main_table"), id);
+                    deleteRow(false);
+                }
+            } else {
+                if (currStatus == 1) {
+                    currRow = findRowIndex(document.getElementById("main_table"), id);
+                    deleteRow(false);
+                }
+            }
+            updateSummaryTable(document.getElementById("summary_table"), notes, statuses, categories);
+        }
+
+        function addRow(currDate, text, category = categories[0], status = statuses[0], noteId) {
+            rowIndex += 1;
+
+            let table = document.getElementById("main_table");
+            let row = table.insertRow(table.rows.length);
+            row.addEventListener('click', function () { selectRow(noteId) });
+            let cell1 = row.insertCell(0);
+            cell1.innerHTML = "<input type = \"time\" value = \"" + getTime(currDate) + "\">";
+            let cell2 = row.insertCell(1);
+            cell2.contentEditable = true;
+            cell2.innerHTML = text;
+            cell2.addEventListener('DOMCharacterDataModified', function () { changedData(cell2.innerHTML, noteId) }, false);
+            let cell3 = row.insertCell(2);
+            cell3.innerHTML = "<select id = \"" + "category" + noteId + "\">" +
+                "<option value = \"" + categories[0] + "\">" + categories[0] + "</option>" +
+                "<option value = \"" + categories[1] + "\">" + categories[1] + "</option>" +
+                "<option value = \"" + categories[2] + "\">" + categories[2] + "</option></select>";
+            switch (notes[findNoteIndex(notes, noteId)].Category) {
+                case categories[0]:
+                    document.getElementById("category" + noteId).options.selectedIndex = 0;
+                    break;
+                case categories[1]:
+                    document.getElementById("category" + noteId).options.selectedIndex = 1;
+                    break;
+                case categories[2]:
+                    document.getElementById("category" + noteId).options.selectedIndex = 2;
+                    break;
+            }
+            document.getElementById('category' + noteId).addEventListener('change', function () { changedCategory(noteId) });
+            let cell4 = row.insertCell(3);
+            let cell5 = row.insertCell(4);
+            if (status == statuses[0]) {
+                cell5.innerHTML = "<select id = \"" + "status" + noteId + "\">" +
+                    "<option value = \"" + statuses[0] + "\" selected>Active</option>" +
+                    "<option value = \"" + statuses[1] + "\">Archived</option>";
+            } else {
+                cell5.innerHTML = "<select id = \"" + "status" + noteId + "\">" +
+                    "<option value = \"" + statuses[0] + "\">Active</option>" +
+                    "<option value = \"" + statuses[1] + "\" selected>Archived</option>";
+            }
+
+            let cell6 = row.insertCell(5);
+            cell6.style.display = "none";
+            document.getElementById('status' + noteId).addEventListener('change', function () { changedStatus(noteId) });
+            cell6.innerHTML = noteId;
+        }
+
+        function newNote() {
+            noteId += 1;
+            let note = new Note(new Date(), "Notes", categories[0], statuses[0], noteId);
+            notes.push(note);
+            if (currStatus == 0) {
+                addRow(note.Time, note.Text, note.Category, note.Status, note.Id);
+            }
+            updateSummaryTable(document.getElementById("summary_table"), notes, statuses, categories);
+        }
+
+        function delete_note(index) {
+            notes.splice(index, 1);
+            updateSummaryTable(document.getElementById("summary_table"), notes, statuses, categories);
+        }
+
+        function deleteRow(deleteFromNotes = true) {
+            if (currRow > -1) {
+                let table = document.getElementById("main_table");
+                if (deleteFromNotes) {
+                    let currNoteIndex = table.rows[currRow].cells[5].innerHTML;
+                    let index = findNoteIndex(notes, currNoteIndex);
+                    delete_note(index);
+                }
+                table.deleteRow(currRow);
+                currRow = -1;
+            }
+        }
+
+        function populate(n = 5) {
+            for (let i = 0; i < n; i++) {
+                newNote();
+            }
+        }
+        populate();
+    </script>
+</body>
+
+</html>
