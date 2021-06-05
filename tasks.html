@@ -7,6 +7,7 @@
 <body>
 
     <div class="tables">
+        <h2>Main table</h2>
         <table id="main_table">
             <tbody>
                 <tr>
@@ -27,30 +28,33 @@
         </select>
     </div>
 
-    <table class="tables" id="summary_table">
-        <tbody>
-            <tr>
-                <th class="Note_category">Note category</th>
-                <th class="Active_notes">Active</th>
-                <th class="Archived_notes">Archived</th>
-            </tr>
-            <tr>
-                <td class="category"> Task </td>
-                <td id="Active_tasks"> 0 </td>
-                <td id="Archieved_tasks"> 0 </td>
-            </tr>
-            <tr>
-                <td class="category"> Random Thought </td>
-                <td id="Active_thoughts"> 0 </td>
-                <td id="Archived_thoughts"> 0 </td>
-            </tr>
-            <tr>
-                <td class="category"> Idea </td>
-                <td id="Active_ideas"> 0 </td>
-                <td id="Archived_ideas"> 0 </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="tables right" >
+        <h2>Summary table</h2>
+        <table id="summary_table">
+            <tbody>
+                <tr>
+                    <th class="Note_category">Note category</th>
+                    <th class="Active_notes">Active</th>
+                    <th class="Archived_notes">Archived</th>
+                </tr>
+                <tr>
+                    <td class="category"> Task </td>
+                    <td id="Active_tasks"> 0 </td>
+                    <td id="Archieved_tasks"> 0 </td>
+                </tr>
+                <tr>
+                    <td class="category"> Random Thought </td>
+                    <td id="Active_thoughts"> 0 </td>
+                    <td id="Archived_thoughts"> 0 </td>
+                </tr>
+                <tr>
+                    <td class="category"> Idea </td>
+                    <td id="Active_ideas"> 0 </td>
+                    <td id="Archived_ideas"> 0 </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <script type="text/javascript" src="note.js"></script>
     <script type="text/javascript" src="tables.js"></script>
