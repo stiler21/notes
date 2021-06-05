@@ -1,0 +1,63 @@
+
+table, td {
+    border: 1px solid black;
+    word-wrap:break-word;
+    table-layout: fixed;
+}
+
+td {
+    text-align: center;
+}
+
+.tables {
+    width: 48%;
+    float: left;
+}
+
+#summary_table {
+    margin-left: 2%;
+}
+
+table {
+    width: 100%;
+}
+
+.Note_category {
+    width: 80%;
+}
+
+.Active_notes {
+    width: 10%;
+}
+
+.Archived_notes {
+    width: 10%;
+}
+
+th {
+    border: 2px solid black;
+}
+
+.Time_header {
+    width: 14%;
+}
+
+.Note_header {
+    width: 35%;
+}
+
+.Category_header {
+    width: 20%;
+}
+
+.Dates_header {
+    width: 17%;
+}
+
+.Status_header {
+    width: 14%;
+}
+
+.ID {
+    display: none;
+}
